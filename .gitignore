@@ -107,4 +107,4 @@ venv.bak/
 .vscode/
 
 # file with usernames and intraservice IDs
-users
+data/

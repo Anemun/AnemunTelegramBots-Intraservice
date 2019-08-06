@@ -1,10 +1,9 @@
 import telebot
 import argparse, sys
-import mod
 import intraserviceProvider
 from telebot import types
 
-version = "0.1.0"
+version = "0.1.1"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
