@@ -4,6 +4,8 @@ pipeline {
         DOCKER_IMAGE = "anemun/anemrepo:jackintrbot"
         CONTAINER_NAME = "${params.containerName}"        
         BOT_TOKEN = "${params.botToken}"
+        SITE_LOGIN = "${params.siteLogin}"
+        SITE_PASS = "${params.sitePass}"
         DATA_PATH_CONTAINER = "/usr/src/app/data"
     }
     stages {         
@@ -37,7 +39,7 @@ pipeline {
                                     string(credentialsId: 'ServerIP', variable: 'IP')]) { 
                                 sh "ssh -o StrictHostKeyChecking=no $IP docker login -u $USERNAME -p $PASSWORD"
                                 sh "ssh -o StrictHostKeyChecking=no $IP docker pull $DOCKER_IMAGE"
-                                sh "ssh -o StrictHostKeyChecking=no $IP docker run -d --restart always -v /etc/localtime:/etc/localtime:ro -v /home/JackIntrData:$DATA_PATH_CONTAINER --name $CONTAINER_NAME $DOCKER_IMAGE --botToken $BOT_TOKEN --siteLogin $SITE_LOGIN --sitePass $SITE_PASSWORD"
+                                sh "ssh -o StrictHostKeyChecking=no $IP docker run -d --restart always -v /etc/localtime:/etc/localtime:ro -v /home/JackIntrData:$DATA_PATH_CONTAINER --name $CONTAINER_NAME $DOCKER_IMAGE --botToken $BOT_TOKEN --siteLogin $SITE_LOGIN --sitePass $SITE_PASS"
                             }
                         }
                     }
