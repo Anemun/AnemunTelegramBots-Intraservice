@@ -3,7 +3,7 @@ import argparse, sys, os
 import intraserviceProvider, watcher
 from telebot import types
 
-version = "0.1.4"
+version = "0.2.0"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -29,16 +29,14 @@ if os.path.isfile('data/users.list') is False:
 
 
 @bot.message_handler(commands=["start"])
-def start(message):
-    if intraserviceProvider.auth(message.from_user.username) is False:
-        return
-    if id is not None:
+def command_start(message):
+    if intraserviceProvider.auth(message.from_user.username) is True:
         bot.send_message(message.chat.id, "Вы можете пользоваться ботом. Попробуйте следующие команды:\n/fresh\n/watch\n/stop")
     else:
         bot.send_message(message.chat.id, "Использование данного бота не авторизовано. Обратитесь к администратору.")
 
 @bot.message_handler(commands=["fresh"])
-def getFromWatcher(message):
+def command_fresh(message):
     if intraserviceProvider.auth(message.from_user.username) is False:
         return
     tickets = intraserviceProvider.getWatcher()
@@ -49,7 +47,7 @@ def getFromWatcher(message):
     bot.send_message(chat_id=message.chat.id, text="Диспетчер: " + str(len(tickets)) + " заявок",reply_markup=keyboard)
 
 @bot.message_handler(commands=["watch"])
-def subscribeForWatcher(message):
+def command_watch(message):
     if intraserviceProvider.auth(message.from_user.username) is False:
         return
     result = watcher.addChatToWatcher(message.chat.id)        
@@ -61,8 +59,14 @@ def subscribeForWatcher(message):
         return
 
 @bot.message_handler(commands=["stop"])
-def stop(message):
-    pass
+def command_stop(message):
+    if intraserviceProvider.auth(message.from_user.username) is False:
+        return
+    result = watcher.removeChatFromWatcher(message.chat.id)
+    if result == 'removed':
+        bot.send_message(chat_id=message.chat.id, text="Данный чат более не будет получать обновлений диспетчера")
+    if result == 'wasnot':
+        bot.send_message(chat_id=message.chat.id, text="Данный чат не подписан на обновления диспетчера")
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
@@ -70,6 +74,14 @@ def callback_inline(call):
         ticketId = call.data.split('_')[1]
     ticket = intraserviceProvider.getTicketById(ticketId)
     bot.send_message(chat_id=call.message.chat.id, text="№: {0}\nСоздатель: {1}\nНазвание: {2}".format(ticket.id, ticket.creatorName, ticket.title))
+
+@bot.message_handler(content_types=['voice'])
+def newTicketFromAudio(message):
+    bot.send_message(chat_id=message.chat.id, text="audio received")
+
+@bot.message_handler()
+def newTicketFromInput(message):
+    bot.send_message(chat_id=message.chat.id, text=message.text)
 
 def sendWatcherUpdates(chatId, tickets):
     keyboard = types.InlineKeyboardMarkup()

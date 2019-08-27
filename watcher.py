@@ -24,7 +24,12 @@ class chatToWatch:
             if len(content) > 0:
                 self.acknowledged = content.split('\n')
 
+    def removeFile(self):
+        if os.path.isfile('data/chats/{0}.chat'.format(self.chatID)) is True:
+            os.remove('data/chats/{0}.chat'.format(self.chatID))
+            self.acknoledged = []
 
+# TODO: acknowledged cleanup
 
 chatsForWatcher = {}
 telebot = None
@@ -45,16 +50,33 @@ def initWatcher(bot, fun):
     timerWatcher.start()
 
 def addChatToWatcher(chatId):
+    chatId = str(chatId)  
     with open('data/chats.list', 'a+') as file:
         file.seek(0)
         content = file.read()     
         ids = content.split('\n')
-        if str(chatId) not in ids:
+        if chatId not in ids:
             file.write('{0}\n'.format(chatId))
             chatsForWatcher[chatId] = chatToWatch(chatId)
             return 'added'
         else:
             return 'already'
+
+def removeChatFromWatcher(chatId):
+    chatId = str(chatId)  
+    file = open('data/chats.list', 'r')
+    content = file.read()    
+    ids = content.split('\n')
+    if chatId in ids:
+        stringToReplace = "{0}\n".format(chatId)
+        content = content.replace(stringToReplace, "")
+        file = open('data/chats.list', 'w+')
+        file.write(content)
+        chatsForWatcher[chatId].removeFile()
+        chatsForWatcher.pop(chatId, None)
+        return 'removed'
+    else:
+        return 'wasnot'
 
 def sendUpdateFromWatcher():
     watcherTickets = intraserviceProvider.getWatcher()
