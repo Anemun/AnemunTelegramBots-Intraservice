@@ -1,9 +1,10 @@
 import telebot
 import argparse, sys, os
-import intraserviceProvider, watcher
+import intraserviceProvider, watcher, recognizer
+import soundfile as sf
 from telebot import types
 
-version = "0.2.0"
+version = "0.2.1"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -18,6 +19,8 @@ login = args.siteLogin
 password = args.sitePass
 intraserviceProvider.login = login
 intraserviceProvider.password = password
+
+print("Intraservice bot started (ver. {0})".format(version))
 
 try:
     os.makedirs('./data/chats')
@@ -77,7 +80,26 @@ def callback_inline(call):
 
 @bot.message_handler(content_types=['voice'])
 def newTicketFromAudio(message):
-    bot.send_message(chat_id=message.chat.id, text="audio received")
+    oggFilePath = './data/voices/{0}.ogg'.format(message.voice.file_id)
+    wavFilePath = './data/voices/{0}.wav'.format(message.voice.file_id)
+
+    # download file from Telegram
+    file_onserver = bot.get_file(message.voice.file_id)
+    file_downloaded=bot.download_file(file_onserver.file_path)
+    with open(oggFilePath, 'wb') as newfile:
+        newfile.write(file_downloaded)
+
+    # convert from ogg to wav (apt-get install ffmpeg for that!)
+    import subprocess
+    process = subprocess.run(['ffmpeg', '-i', oggFilePath, wavFilePath])
+    if process.returncode != 0:
+        raise Exception("Something went wrong")
+    os.remove(oggFilePath)
+    
+    # TEMP. send recognition result back to chat (should create new ticket with recognized text)
+    result = recognizer.recognize(wavFilePath)    
+    os.remove(wavFilePath)    
+    bot.send_message(chat_id=message.chat.id, text=result)
 
 @bot.message_handler()
 def newTicketFromInput(message):
