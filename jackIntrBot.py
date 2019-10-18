@@ -1,10 +1,10 @@
-import telebot
+import telebot, config
 import argparse, sys, os
-import intraserviceProvider, watcher, recognizer
+import intraserviceProvider, watcher, recognizer, lambdaHandlers
 import soundfile as sf
 from telebot import types
 
-version = "0.2.1"
+version = "0.3.0"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -20,14 +20,14 @@ password = args.sitePass
 intraserviceProvider.login = login
 intraserviceProvider.password = password
 
-print("Intraservice bot started (ver. {0})".format(version))
+print("Бот для Интрасервиса запущен (вер. {0})".format(version))
 
 try:
     os.makedirs('./data/chats')
 except OSError:
     pass
-if os.path.isfile('data/users.list') is False: 
-    open('data/users.list','w+')
+if os.path.isfile(config.userListFile) is False: 
+    open(config.userListFile,'w+')
 
 
 
@@ -45,9 +45,9 @@ def command_fresh(message):
     tickets = intraserviceProvider.getWatcher()
     keyboard = types.InlineKeyboardMarkup()
     for ticket in tickets:
-        button = types.InlineKeyboardButton(text=ticket.title, callback_data="ticket_"+ str(ticket.id))
+        button = types.InlineKeyboardButton(text="[{0}] {1}".format(ticket.id, ticket.title), callback_data="ticket_"+ str(ticket.id))
         keyboard.add(button)
-    bot.send_message(chat_id=message.chat.id, text="Диспетчер: " + str(len(tickets)) + " заявок",reply_markup=keyboard)
+    bot.send_message(chat_id=message.chat.id, text="Заявок в диспетчере: " + str(len(tickets)),reply_markup=keyboard)
 
 @bot.message_handler(commands=["watch"])
 def command_watch(message):
@@ -71,48 +71,63 @@ def command_stop(message):
     if result == 'wasnot':
         bot.send_message(chat_id=message.chat.id, text="Данный чат не подписан на обновления диспетчера")
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_inline(call):
-    if call.data.split('_')[0] == "ticket":
-        ticketId = call.data.split('_')[1]
-    ticket = intraserviceProvider.getTicketById(ticketId)
-    bot.send_message(chat_id=call.message.chat.id, text="№: {0}\nСоздатель: {1}\nНазвание: {2}".format(ticket.id, ticket.creatorName, ticket.title))
+# @bot.message_handler(content_types=['voice'])
+# def newTicketFromAudio(message):
+#     # NOT IMPLEMENTED IN CURRENT BUILD
+#     return
 
-@bot.message_handler(content_types=['voice'])
-def newTicketFromAudio(message):
-    oggFilePath = './data/voices/{0}.ogg'.format(message.voice.file_id)
-    wavFilePath = './data/voices/{0}.wav'.format(message.voice.file_id)
+#     oggFilePath = './data/voices/{0}.ogg'.format(message.voice.file_id)
+#     wavFilePath = './data/voices/{0}.wav'.format(message.voice.file_id)
 
-    # download file from Telegram
-    file_onserver = bot.get_file(message.voice.file_id)
-    file_downloaded=bot.download_file(file_onserver.file_path)
-    with open(oggFilePath, 'wb') as newfile:
-        newfile.write(file_downloaded)
+#     # download file from Telegram
+#     file_onserver = bot.get_file(message.voice.file_id)
+#     file_downloaded=bot.download_file(file_onserver.file_path)
+#     with open(oggFilePath, 'wb') as newfile:
+#         newfile.write(file_downloaded)
 
-    # convert from ogg to wav (apt-get install ffmpeg for that!)
-    import subprocess
-    process = subprocess.run(['ffmpeg', '-i', oggFilePath, wavFilePath])
-    if process.returncode != 0:
-        raise Exception("Something went wrong")
-    os.remove(oggFilePath)
+#     # convert from ogg to wav (apt-get install ffmpeg for that!)
+#     import subprocess
+#     process = subprocess.run(['ffmpeg', '-i', oggFilePath, wavFilePath])
+#     if process.returncode != 0:
+#         raise Exception("Something went wrong")
+#     os.remove(oggFilePath)
     
-    # TEMP. send recognition result back to chat (should create new ticket with recognized text)
-    result = recognizer.recognize(wavFilePath)    
-    os.remove(wavFilePath)    
-    bot.send_message(chat_id=message.chat.id, text=result)
+#     # TEMP. send recognition result back to chat (should create new ticket with recognized text)
+#     result = recognizer.recognize(wavFilePath)    
+#     os.remove(wavFilePath)    
 
-@bot.message_handler()
-def newTicketFromInput(message):
-    bot.send_message(chat_id=message.chat.id, text=message.text)
+#     keyboard = types.InlineKeyboardMarkup()    
+#     keyboard.row(types.InlineKeyboardButton(text="Создать", callback_data="new_{0};create".format(result)),
+#                  types.InlineKeyboardButton(text="Отменить", callback_data="new_{0};cancel".format(result)))
+
+#     replyText = "Будет создана следующая заявка:\nЗаголовок:\nОписание:{0}\nИсполнитель(и):".format(result)
+#     bot.send_message(chat_id=message.chat.id, text=replyText, reply_markup=keyboard)
+
+# @bot.message_handler()
+# def newTicketFromInput(message):
+#     # NOT IMPLEMENTED IN CURRENT BUILD
+#     return
+#     bot.send_message(chat_id=message.chat.id, text=message.text)
 
 def sendWatcherUpdates(chatId, tickets):
     keyboard = types.InlineKeyboardMarkup()
     for ticket in tickets:
-        button = types.InlineKeyboardButton(text=ticket.title, callback_data="ticket_"+ str(ticket.id))
+        button = types.InlineKeyboardButton(text="[{0}] {1}".format(ticket.id, ticket.title), callback_data="ticket_"+ str(ticket.id))
         keyboard.add(button)
     bot.send_message(chat_id=chatId, text="В диспетчере появилось новых заявок: {0}".format(len(tickets)),reply_markup=keyboard)
 
 watcher.initWatcher(bot, sendWatcherUpdates)
+
+# Catch calldata
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    callType = call.data.split('_')[0]
+    if callType == "ticket":
+        lambdaHandlers.returnTicketInfo(bot,call)
+    # elif callType == "new":
+    #     lambdaHandlers.createNewTicket(bot,call)
+    # elif callType == "addEx":
+    #     lambdaHandlers.addExecutor(bot,call)
 
 if __name__ == '__main__':
     bot.polling(none_stop=True)
