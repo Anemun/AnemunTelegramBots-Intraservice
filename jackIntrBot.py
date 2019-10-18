@@ -5,7 +5,7 @@ import intraserviceProvider, watcher, lambdaHandlers
 #import soundfile as sf
 from telebot import types
 
-version = "0.3.0"
+version = "0.3.1"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')

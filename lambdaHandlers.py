@@ -19,14 +19,14 @@ def returnTicketInfo(bot, call):
         # bot.send_message(chat_id=call.message.chat.id, text="№: {0}\nСоздатель: {1}\nНазвание: {2}\nИсполнители: {3}"
         #                                              .format(ticket.id, ticket.creatorName, ticket.title, executors), 
         #                                                                                        reply_markup=keyboard)
-        bot.send_message(chat_id=call.message.chat.id, text="№: {0}\nСоздатель: {1}\nНазвание: {2}\nОписание: {3}\nИсполнители: {4}"
-                                                     .format(ticket.id, ticket.creatorName, ticket.title, ticket.description, executors))
+        bot.send_message(chat_id=call.message.chat.id, text="№: {0}\nСоздатель: {1} ({2})\nНазвание: {3}\nОписание: {4}\nИсполнители: {5}"
+                                                     .format(ticket.id, ticket.creatorName, ticket.creatorCompanyName, ticket.title, ticket.description, executors))
     else:
         # bot.send_message(chat_id=call.message.chat.id, text="№: {0}\nСоздатель: {1}\nНазвание: {2}"
         #                                       .format(ticket.id, ticket.creatorName, ticket.title),
         #                                                                      reply_markup=keyboard)
-        bot.send_message(chat_id=call.message.chat.id, text="№: {0}\nСоздатель: {1}\nНазвание: {2}\nОписание: {3}"
-                                              .format(ticket.id, ticket.creatorName, ticket.title, ticket.description))
+        bot.send_message(chat_id=call.message.chat.id, text="№: {0}\nСоздатель: {1} ({2})\nНазвание: {3}\nОписание: {4}"
+                                              .format(ticket.id, ticket.creatorName, ticket.creatorCompanyName, ticket.title, ticket.description))
 
 # # TODO:
 # def createNewTicket(bot, call):
