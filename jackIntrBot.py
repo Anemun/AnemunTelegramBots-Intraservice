@@ -1,7 +1,8 @@
 import telebot, config
 import argparse, sys, os
-import intraserviceProvider, watcher, recognizer, lambdaHandlers
-import soundfile as sf
+import intraserviceProvider, watcher, lambdaHandlers
+#import recognizer
+#import soundfile as sf
 from telebot import types
 
 version = "0.3.0"
