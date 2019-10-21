@@ -5,7 +5,7 @@ import intraserviceProvider, watcher, lambdaHandlers
 #import soundfile as sf
 from telebot import types
 
-version = "0.3.1"
+version = "0.3.2"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -111,11 +111,22 @@ def command_stop(message):
 #     bot.send_message(chat_id=message.chat.id, text=message.text)
 
 def sendWatcherUpdates(chatId, tickets):
-    keyboard = types.InlineKeyboardMarkup()
-    for ticket in tickets:
-        button = types.InlineKeyboardButton(text="[{0}] {1}".format(ticket.id, ticket.title), callback_data="ticket_"+ str(ticket.id))
-        keyboard.add(button)
-    bot.send_message(chat_id=chatId, text="В диспетчере появилось новых заявок: {0}".format(len(tickets)),reply_markup=keyboard)
+    if len(tickets) > 0:
+        for ticket in tickets:
+            if ticket.executors[0] is not None:
+                executors = ""
+                
+                for i in range(0, len(ticket.executors)):
+                    if len(ticket.executors)-1 == i:  # if i is the last element, we do not want the comma
+                        executors += "{0}".format(ticket.executors[i])
+                    else:
+                        executors += "{0}, ".format(ticket.executors[i])   
+
+                bot.send_message(chat_id=chatId, parse_mode="markdown", text="*№: {0}*\n*Создатель:* {1} ({2})\n*Название:* {3}\n*Описание:* {4}\n*Исполнители:* {5}"
+                                        .format(ticket.id, ticket.creatorName, ticket.creatorCompanyName, ticket.title, ticket.description, executors))
+            else:            
+                bot.send_message(chat_id=chatId, parse_mode="markdown", text="*№: {0}*\n*Создатель:* {1} ({2})\n*Название:* {3}\n*Описание:* {4}"
+                                        .format(ticket.id, ticket.creatorName, ticket.creatorCompanyName, ticket.title, ticket.description))
 
 watcher.initWatcher(bot, sendWatcherUpdates)
 
