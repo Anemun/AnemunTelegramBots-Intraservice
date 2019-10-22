@@ -1,5 +1,6 @@
 import intraserviceProvider, os
 import Ticket
+import config
 from threading import Timer
 
 class RepeatTimer(Timer):
@@ -46,7 +47,7 @@ def initWatcher(bot, fun):
             for chatId in content.split('\n'):
                 if chatId is "": continue           # skip an empty line at the end of the file
                 chatsForWatcher[chatId] = chatToWatch(chatId)
-    timerWatcher = RepeatTimer(10, sendUpdateFromWatcher)    
+    timerWatcher = RepeatTimer(config.watcherChekoutInterval, sendUpdateFromWatcher)    
     timerWatcher.start()
 
 def addChatToWatcher(chatId):
