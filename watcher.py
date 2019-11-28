@@ -2,6 +2,7 @@ import intraserviceProvider, os
 import Ticket
 import config
 from threading import Timer
+from jackIntrBot import debugLog
 
 class RepeatTimer(Timer):
     def run(self):
@@ -43,14 +44,18 @@ def initWatcher(bot, fun):
     updateFunction = fun
     if os.path.isfile('data/chats.list') is True:
         content = open('data/chats.list','r+').read()
+        debugLog("Initializing watcher... chats to watch:")
         if len(content) > 0:
             for chatId in content.split('\n'):
                 if chatId is "": continue           # skip an empty line at the end of the file
                 chatsForWatcher[chatId] = chatToWatch(chatId)
+                debugLog("\t{0}".format(chatId))
     timerWatcher = RepeatTimer(config.watcherChekoutInterval, sendUpdateFromWatcher)    
     timerWatcher.start()
+    debugLog("Check timer is set to {0} seconds".format(config.watcherChekoutInterval))
 
 def addChatToWatcher(chatId):
+    debugLog("Adding new chat to watcher:")
     chatId = str(chatId)  
     with open('data/chats.list', 'a+') as file:
         file.seek(0)
@@ -59,33 +64,41 @@ def addChatToWatcher(chatId):
         if chatId not in ids:
             file.write('{0}\n'.format(chatId))
             chatsForWatcher[chatId] = chatToWatch(chatId)
+            debugLog("\tchat {0} added.".format(chatId))
             return 'added'
         else:
+            debugLog("\tchat {0} already added to watcher.".format(chatId))
             return 'already'
 
 def removeChatFromWatcher(chatId):
+    debugLog("Removing chat from watcher:")
     chatId = str(chatId)  
     file = open('data/chats.list', 'r')
     content = file.read()    
     ids = content.split('\n')
     if chatId in ids:
         stringToReplace = "{0}\n".format(chatId)
-        content = content.replace(stringToReplace, "")
+        content = content.replace(stringToReplace, "")        
         file = open('data/chats.list', 'w+')
         file.write(content)
         chatsForWatcher[chatId].removeFile()
         chatsForWatcher.pop(chatId, None)
+        debugLog("\tchat {0} removed.".format(chatId))
         return 'removed'
     else:
+        debugLog("\tchat {0} is not present in watcher list.".format(chatId))
         return 'wasnot'
 
 def sendUpdateFromWatcher():
+    debugLog("It's time to send watcher updates to: {0}".format(chatsForWatcher))
     watcherTickets = intraserviceProvider.getWatcher()
     if len(watcherTickets) > 0:
-        ticketIDs = [ticket.id for ticket in watcherTickets]
+        #ticketIDs = [ticket.id for ticket in watcherTickets]
         for chat in chatsForWatcher:
-            newTickets = filterNewTickets(chat, watcherTickets)
+            debugLog("Filtering new tickets for chat {0}".format(chat.chatID))
+            newTickets = filterNewTickets(chat, watcherTickets)            
             if len(newTickets) > 0:
+                debugLog("New tickets: {0}".format(newTickets))
                 updateFunction(chat, newTickets)
                 pass
     # check for tickets in watcher list

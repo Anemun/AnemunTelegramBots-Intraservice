@@ -1,11 +1,11 @@
 import telebot, config
-import argparse, sys, os
+import argparse, sys, os, datetime
 import intraserviceProvider, watcher, lambdaHandlers
 #import recognizer
 #import soundfile as sf
 from telebot import types
 
-version = "0.3.3"
+version = "0.3.4"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -21,7 +21,12 @@ password = args.sitePass
 intraserviceProvider.login = login
 intraserviceProvider.password = password
 
-print("Бот для Интрасервиса запущен (вер. {0})".format(version))
+def debugLog(message):
+    if config.debugEnabled:
+        print("{0}: {1}".format(datetime.datetime.now(), message))
+        sys.stdout.flush()
+
+debugLog("Бот для Интрасервиса запущен (вер. {0})".format(version))
 
 try:
     os.makedirs('./data/chats')
@@ -112,6 +117,7 @@ def command_stop(message):
 
 def sendWatcherUpdates(chatId, tickets):
     if len(tickets) > 0:
+        debugLog("New tickets in watcher ({0}), sending updates...".format(len(tickets)))
         for ticket in tickets:
             if ticket.executors[0] is not None:
                 executors = ""
