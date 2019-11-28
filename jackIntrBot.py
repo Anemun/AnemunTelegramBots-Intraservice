@@ -1,9 +1,10 @@
 import telebot, config
-import argparse, sys, os, datetime
+import argparse, os
 import intraserviceProvider, watcher, lambdaHandlers
 #import recognizer
 #import soundfile as sf
 from telebot import types
+from tools import debugLog
 
 version = "0.3.4"
 
@@ -21,10 +22,6 @@ password = args.sitePass
 intraserviceProvider.login = login
 intraserviceProvider.password = password
 
-def debugLog(message):
-    if config.debugEnabled:
-        print("{0}: {1}".format(datetime.datetime.now(), message))
-        sys.stdout.flush()
 
 debugLog("Бот для Интрасервиса запущен (вер. {0})".format(version))
 

@@ -2,7 +2,7 @@ import intraserviceProvider, os
 import Ticket
 import config
 from threading import Timer
-from jackIntrBot import debugLog
+from tools import debugLog
 
 class RepeatTimer(Timer):
     def run(self):
