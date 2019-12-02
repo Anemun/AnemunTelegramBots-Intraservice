@@ -95,12 +95,12 @@ def sendUpdateFromWatcher():
     watcherTickets = intraserviceProvider.getWatcher()
     if len(watcherTickets) > 0 and len(chatsForWatcher) > 0:
         #ticketIDs = [ticket.id for ticket in watcherTickets]        
-        for chat in chatsForWatcher:
-            debugLog("Filtering new tickets for chat {0}".format(chat.chatID))
-            newTickets = filterNewTickets(chat, watcherTickets)            
+        for chat in chatsForWatcher.items():
+            debugLog("Filtering new tickets for chat {0}".format(chat[1].chatID))
+            newTickets = filterNewTickets(chat[1].chatID, watcherTickets)            
             if len(newTickets) > 0:
                 debugLog("New tickets: {0}".format(newTickets))
-                updateFunction(chat, newTickets) 
+                updateFunction(chat[1].chatID, newTickets) 
         else:
             debugLog("\tNo new tickets...")
     else:
