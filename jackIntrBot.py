@@ -6,7 +6,7 @@ import intraserviceProvider, watcher, lambdaHandlers
 from telebot import types
 from tools import debugLog
 
-version = "0.3.4"
+version = "0.3.4-1"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')

@@ -33,6 +33,7 @@ class chatToWatch:
 
 # TODO: acknowledged cleanup
 
+debugLog("Resetting variables...")
 chatsForWatcher = {}
 telebot = None
 updateFunction = None
@@ -90,7 +91,7 @@ def removeChatFromWatcher(chatId):
         return 'wasnot'
 
 def sendUpdateFromWatcher():
-    debugLog("It's time to send watcher updates to: {0}".format(chatsForWatcher))
+    debugLog("It's time to send watcher updates to: {0}".format(chatsForWatcher.keys))
     watcherTickets = intraserviceProvider.getWatcher()
     if len(watcherTickets) > 0:
         #ticketIDs = [ticket.id for ticket in watcherTickets]
@@ -99,12 +100,12 @@ def sendUpdateFromWatcher():
             newTickets = filterNewTickets(chat, watcherTickets)            
             if len(newTickets) > 0:
                 debugLog("New tickets: {0}".format(newTickets))
-                updateFunction(chat, newTickets)
-                pass
-    # check for tickets in watcher list
-    # for each chatID check is any of tickets is new
-    # if it it, form a list and send it.
-    pass
+                updateFunction(chat, newTickets) 
+            else:
+                debugLog("\tNo new tickets...")
+    else:
+        debugLog("\tWatcher is empty...")
+    
 
 # filter already acknoledged tickets from received list
 def filterNewTickets(chatID, tickets):
