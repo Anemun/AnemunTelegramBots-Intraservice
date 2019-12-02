@@ -93,18 +93,18 @@ def removeChatFromWatcher(chatId):
 def sendUpdateFromWatcher():
     debugLog("It's time to send watcher updates to: {0}".format(chatsForWatcher))
     watcherTickets = intraserviceProvider.getWatcher()
-    if len(watcherTickets) > 0:
-        #ticketIDs = [ticket.id for ticket in watcherTickets]
+    if len(watcherTickets) > 0 and len(chatsForWatcher) > 0:
+        #ticketIDs = [ticket.id for ticket in watcherTickets]        
         for chat in chatsForWatcher:
             debugLog("Filtering new tickets for chat {0}".format(chat.chatID))
             newTickets = filterNewTickets(chat, watcherTickets)            
             if len(newTickets) > 0:
                 debugLog("New tickets: {0}".format(newTickets))
                 updateFunction(chat, newTickets) 
-            else:
-                debugLog("\tNo new tickets...")
+        else:
+            debugLog("\tNo new tickets...")
     else:
-        debugLog("\tWatcher is empty...")
+        debugLog("\tWatcher is empty or no chats subscribed to updates...")
     
 
 # filter already acknoledged tickets from received list
