@@ -91,7 +91,7 @@ def removeChatFromWatcher(chatId):
         return 'wasnot'
 
 def sendUpdateFromWatcher():
-    debugLog("It's time to send watcher updates to: {0}".format(chatsForWatcher.keys))
+    debugLog("It's time to send watcher updates to: {0}".format(chatsForWatcher))
     watcherTickets = intraserviceProvider.getWatcher()
     if len(watcherTickets) > 0:
         #ticketIDs = [ticket.id for ticket in watcherTickets]
