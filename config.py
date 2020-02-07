@@ -1,4 +1,4 @@
 userListFile = 'data/users.list'
-watcherChekoutInterval = 60 # in seconds
+watcherChekoutInterval = 180 # in seconds
 
 debugEnabled = True

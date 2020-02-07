@@ -85,8 +85,8 @@ def command_stop(message):
 #     # download file from Telegram
 #     file_onserver = bot.get_file(message.voice.file_id)
 #     file_downloaded=bot.download_file(file_onserver.file_path)
-#     with open(oggFilePath, 'wb') as newfile:
-#         newfile.write(file_downloaded)
+    #  with open(oggFilePath, 'wb') as newfile:
+    #      newfile.write(file_downloaded)
 
 #     # convert from ogg to wav (apt-get install ffmpeg for that!)
 #     import subprocess
@@ -145,4 +145,10 @@ def callback_inline(call):
     #     lambdaHandlers.addExecutor(bot,call)
 
 if __name__ == '__main__':
-    bot.polling(none_stop=True)
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except:
+            pass
+        else:
+            break

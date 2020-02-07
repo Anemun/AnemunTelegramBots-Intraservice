@@ -101,8 +101,8 @@ def sendUpdateFromWatcher():
             if len(newTickets) > 0:
                 debugLog("New tickets: {0}".format(newTickets))
                 updateFunction(chat[1].chatID, newTickets) 
-        else:
-            debugLog("\tNo new tickets...")
+            else:
+                debugLog("\tNo new tickets for {}".format(chat[1].chatID))
     else:
         debugLog("\tWatcher is empty or no chats subscribed to updates...")
     
