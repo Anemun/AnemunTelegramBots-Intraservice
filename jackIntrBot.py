@@ -4,7 +4,7 @@ import intraserviceProvider, watcher, lambdaHandlers
 from telebot import types
 from tools import debugLog
 
-version = "0.3.5"
+version = "0.3.6"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -15,10 +15,12 @@ args=parser.parse_args()
 botToken = args.botToken
 
 bot = telebot.TeleBot(botToken)
+site = args.site
 login = args.siteLogin
 password = args.sitePass
 intraserviceProvider.login = login
 intraserviceProvider.password = password
+intraserviceProvider.setBaseUrl(site)
 
 
 debugLog("Бот для Интрасервиса запущен (вер. {0})".format(version))
