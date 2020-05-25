@@ -1,8 +1,6 @@
 import telebot, config
 import argparse, os
 import intraserviceProvider, watcher, lambdaHandlers
-#import recognizer
-#import soundfile as sf
 from telebot import types
 from tools import debugLog
 
@@ -74,44 +72,6 @@ def command_stop(message):
     if result == 'wasnot':
         bot.send_message(chat_id=message.chat.id, text="Данный чат не подписан на обновления диспетчера")
 
-# @bot.message_handler(content_types=['voice'])
-# def newTicketFromAudio(message):
-#     # NOT IMPLEMENTED IN CURRENT BUILD
-#     return
-
-#     oggFilePath = './data/voices/{0}.ogg'.format(message.voice.file_id)
-#     wavFilePath = './data/voices/{0}.wav'.format(message.voice.file_id)
-
-#     # download file from Telegram
-#     file_onserver = bot.get_file(message.voice.file_id)
-#     file_downloaded=bot.download_file(file_onserver.file_path)
-    #  with open(oggFilePath, 'wb') as newfile:
-    #      newfile.write(file_downloaded)
-
-#     # convert from ogg to wav (apt-get install ffmpeg for that!)
-#     import subprocess
-#     process = subprocess.run(['ffmpeg', '-i', oggFilePath, wavFilePath])
-#     if process.returncode != 0:
-#         raise Exception("Something went wrong")
-#     os.remove(oggFilePath)
-    
-#     # TEMP. send recognition result back to chat (should create new ticket with recognized text)
-#     result = recognizer.recognize(wavFilePath)    
-#     os.remove(wavFilePath)    
-
-#     keyboard = types.InlineKeyboardMarkup()    
-#     keyboard.row(types.InlineKeyboardButton(text="Создать", callback_data="new_{0};create".format(result)),
-#                  types.InlineKeyboardButton(text="Отменить", callback_data="new_{0};cancel".format(result)))
-
-#     replyText = "Будет создана следующая заявка:\nЗаголовок:\nОписание:{0}\nИсполнитель(и):".format(result)
-#     bot.send_message(chat_id=message.chat.id, text=replyText, reply_markup=keyboard)
-
-# @bot.message_handler()
-# def newTicketFromInput(message):
-#     # NOT IMPLEMENTED IN CURRENT BUILD
-#     return
-#     bot.send_message(chat_id=message.chat.id, text=message.text)
-
 def sendWatcherUpdates(chatId, tickets):
     if len(tickets) > 0:
         debugLog("New tickets in watcher ({0}), sending updates...".format(len(tickets)))
@@ -139,11 +99,7 @@ def callback_inline(call):
     callType = call.data.split('_')[0]
     if callType == "ticket":
         lambdaHandlers.returnTicketInfo(bot,call)
-    # elif callType == "new":
-    #     lambdaHandlers.createNewTicket(bot,call)
-    # elif callType == "addEx":
-    #     lambdaHandlers.addExecutor(bot,call)
-
+        
 if __name__ == '__main__':
     while True:
         try:

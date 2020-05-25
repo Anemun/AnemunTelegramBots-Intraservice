@@ -1,7 +1,2 @@
 requests
 pyTelegramBotAPI
-SpeechRecognition
-google-cloud-speech
-google-api-python-client
-gcloud
-oauth2client

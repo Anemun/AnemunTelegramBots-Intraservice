@@ -31,8 +31,6 @@ class chatToWatch:
             os.remove('data/chats/{0}.chat'.format(self.chatID))
             self.acknoledged = []
 
-# TODO: acknowledged cleanup
-
 debugLog("Resetting variables...")
 chatsForWatcher = {}
 telebot = None
