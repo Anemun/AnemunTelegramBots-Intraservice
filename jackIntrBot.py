@@ -4,13 +4,14 @@ import intraserviceProvider, watcher, lambdaHandlers
 from telebot import types
 from tools import debugLog
 
-version = "0.3.6"
+version = "0.4.0"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
 parser.add_argument('--site', help='intraservice address')
 parser.add_argument('--siteLogin', help='intraservice login')
 parser.add_argument('--sitePass', help='intraservice password')
+parser.add_argument('--filterId', help='filter id in intraservice for watcher')
 args=parser.parse_args()
 botToken = args.botToken
 
@@ -18,6 +19,7 @@ bot = telebot.TeleBot(botToken)
 site = args.site
 login = args.siteLogin
 password = args.sitePass
+config.filterId = args.filterId
 intraserviceProvider.login = login
 intraserviceProvider.password = password
 intraserviceProvider.setBaseUrl(site)
@@ -43,9 +45,13 @@ def command_start(message):
 
 @bot.message_handler(commands=["fresh"])
 def command_fresh(message):
+    tickets = {}
     if intraserviceProvider.auth(message.from_user.username) is False:
         return
-    tickets = intraserviceProvider.getWatcher()
+    tickets, err = intraserviceProvider.getWatcher()
+    if tickets is None:
+        bot.send_message(chat_id=message.chat.id, text="Ошибка подключения к Intraservice: " + str(err) + ". Обратитесь к администратору.")
+        return
     keyboard = types.InlineKeyboardMarkup()
     for ticket in tickets:
         button = types.InlineKeyboardButton(text="[{0}] {1}".format(ticket.id, ticket.title), callback_data="ticket_"+ str(ticket.id))

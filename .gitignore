@@ -106,5 +106,8 @@ venv.bak/
 # vscode
 .vscode/
 
+#debian
+.directory
+
 # file with usernames and intraservice IDs
 data/

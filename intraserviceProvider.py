@@ -122,15 +122,19 @@ def getWatcher():
     for i in range(0, 5):
         try:
             debugLog("Getting watcher tickets from intraservice (attempt {} of 5)...".format(i+1))
-            url = baseUrl + "task?filterid=636"
-            r = requests.get(url, auth=requests.auth.HTTPBasicAuth(login, password)).json()
+            url = baseUrl + "task?filterid="+config.filterId
+            request = requests.get(url, auth=requests.auth.HTTPBasicAuth(login, password))
+            if request.status_code >= 400:
+                debugLog("error: can't connect to intraservice API {0}, reason: {1} {2}".format(request.url, request.status_code, request.reason))
+                return None, "error {0} {1}".format(request.status_code, request.reason)
+            r = request.json()
             tickets = parseJSONintoTicketClass(r)
             debugLog("\tdone.\n{0}".format(tickets))
         except:         
             debugLog("error: {0}".format(sys.exc_info()[0]))
             continue
         break
-    return tickets
+    return tickets, None
 
 def getTicketById(id):
     url = baseUrl + "task/" + str(id)
