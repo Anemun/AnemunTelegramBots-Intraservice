@@ -4,7 +4,7 @@ import intraserviceProvider, watcher, lambdaHandlers
 from telebot import types
 from tools import debugLog
 
-version = "0.4.0"
+version = "0.4.1"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -12,6 +12,7 @@ parser.add_argument('--site', help='intraservice address')
 parser.add_argument('--siteLogin', help='intraservice login')
 parser.add_argument('--sitePass', help='intraservice password')
 parser.add_argument('--filterId', help='filter id in intraservice for watcher')
+parser.add_argument('--interval', help='watcher interval between checks is seconds')
 args=parser.parse_args()
 botToken = args.botToken
 
@@ -20,6 +21,7 @@ site = args.site
 login = args.siteLogin
 password = args.sitePass
 config.filterId = args.filterId
+config.watcherChekoutInterval = args.interval
 intraserviceProvider.login = login
 intraserviceProvider.password = password
 intraserviceProvider.setBaseUrl(site)
@@ -93,11 +95,11 @@ def sendWatcherUpdates(chatId, tickets):
                     else:
                         executors += "{0}, ".format(ticket.executors[i])   
 
-                bot.send_message(chat_id=chatId, parse_mode="markdown", text="*№:* [{0}](https://jack-it.intraservice.ru/Task/View/{0})\n*Создатель:* {1} ({2})\n*Название:* {3}\n*Описание:* {4}\n*Исполнители:* {5}"
-                                        .format(ticket.id, ticket.creatorName, ticket.creatorCompanyName, ticket.title, ticket.description, executors))
+                bot.send_message(chat_id=chatId, parse_mode="markdown", text="*№:* [{0}](https://{6}.intraservice.ru/Task/View/{0})\n*Создатель:* {1} ({2})\n*Название:* {3}\n*Описание:* {4}\n*Исполнители:* {5}"
+                                        .format(ticket.id, ticket.creatorName, ticket.creatorCompanyName, ticket.title, ticket.description, executors, site))
             else:            
-                bot.send_message(chat_id=chatId, parse_mode="markdown", text="*№:* [{0}](https://jack-it.intraservice.ru/Task/View/{0})\n*Создатель:* {1} ({2})\n*Название:* {3}\n*Описание:* {4}"
-                                        .format(ticket.id, ticket.creatorName, ticket.creatorCompanyName, ticket.title, ticket.description))
+                bot.send_message(chat_id=chatId, parse_mode="markdown", text="*№:* [{0}](https://{5}.intraservice.ru/Task/View/{0})\n*Создатель:* {1} ({2})\n*Название:* {3}\n*Описание:* {4}"
+                                        .format(ticket.id, ticket.creatorName, ticket.creatorCompanyName, ticket.title, ticket.description, site))
 
 watcher.initWatcher(bot, sendWatcherUpdates)
 

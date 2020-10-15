@@ -110,7 +110,7 @@ def sendUpdateFromWatcher():
 # filter already acknoledged tickets from received list
 def filterNewTickets(chatID, tickets):
     newTickets = []
-    for ticket in tickets:
+    for ticket in tickets[0]:
         if str(ticket.id) not in chatsForWatcher[chatID].acknowledged:
             chatsForWatcher[chatID].addTicketToAcnowledged(ticket.id)
             newTickets.append(ticket)
