@@ -4,7 +4,7 @@ import intraserviceProvider, watcher, lambdaHandlers
 from telebot import types
 from tools import debugLog
 
-version = "0.4.1"
+version = "0.4.2"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -21,7 +21,7 @@ site = args.site
 login = args.siteLogin
 password = args.sitePass
 config.filterId = args.filterId
-config.watcherChekoutInterval = args.interval
+config.watcherChekoutInterval = int(args.interval)
 intraserviceProvider.login = login
 intraserviceProvider.password = password
 intraserviceProvider.setBaseUrl(site)
