@@ -4,7 +4,7 @@ import intraserviceProvider, watcher, lambdaHandlers
 from telebot import types
 from tools import debugLog
 
-version = "0.4.2"
+version = "0.4.3"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -111,10 +111,5 @@ def callback_inline(call):
         lambdaHandlers.returnTicketInfo(bot,call)
         
 if __name__ == '__main__':
-    while True:
-        try:
-            bot.polling(none_stop=True)
-        except:
-            pass
-        else:
-            break
+    bot.polling(none_stop=True, interval=5, timeout=60)
+    
