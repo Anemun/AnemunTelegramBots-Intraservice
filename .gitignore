@@ -111,3 +111,4 @@ venv.bak/
 
 # file with usernames and intraservice IDs
 data/
+*.db

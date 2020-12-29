@@ -12,6 +12,8 @@ executors = {}
 login = ""
 password = ""
 
+
+
 def setBaseUrl(site):
     global baseUrl
     baseUrl = "https://{0}.intraservice.ru/api/".format(site)
@@ -23,6 +25,10 @@ def getCompanyNameByUserName(name):
         url = baseUrl + "user?name=" + name
         r = requests.get(url, auth=requests.auth.HTTPBasicAuth(login, password)).json()
         companyName = r['Users'][0]['Companyname']
+        if len(r['Users']) > 0:
+            for user in r['Users']:
+                if user['IsArchive'] == False:
+                    companyName = user['Companyname']                
         companies[name] = companyName
         return companies[name]
 
@@ -91,32 +97,6 @@ def parseJSONintoTicketClass_singleTask(jsonData):
             dueDate=task['Deadline'],
             executors=executorsNames)
     return ticket
-
-def getIntrIdByUsername(targetUsername):    
-    content = open(config.userListFile,'r+').read()
-    lines = content.split('\n')
-    for line in lines:
-        l = line.split(':')
-        if l[0] == targetUsername:
-            return l[1]
-    return None
-
-def getIntrUsernameById(targetId):    
-    content = open(config.userListFile,'r+').read()
-    lines = content.split('\n')
-    for line in lines:
-        l = line.split(':')
-        if l[1] == targetId:
-            return l[0]
-    return None
-
-def auth(username):    
-    if getIntrIdByUsername(username) is not None:
-        print("Telegram user {0} demanded auth: success".format(username))
-        return True
-    else:
-        print("Telegram user {0} demanded auth: failure".format(username))
-        return False
 
 def getWatcher():    
     for i in range(0, 5):
