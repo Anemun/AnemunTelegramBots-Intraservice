@@ -1,5 +1,4 @@
-userListFile = 'data/users.list'
-dbFilename = 'JackTeleBotUsers.db'
+dbFilename = 'data/JackTeleBotUsers.db'
 watcherChekoutInterval = 180 # in seconds (будет перезаписано параметром, заданном при запуске)
 filterId = 0
 site = ""               # не менять, будет перезаписано параметром, заданном при запуске

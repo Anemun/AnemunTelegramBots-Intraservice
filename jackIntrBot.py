@@ -4,7 +4,7 @@ import intraserviceProvider, watcher, lambdaHandlers, databaseProvider
 from telebot import types
 from tools import debugLog
 
-version = "0.5.1"
+version = "0.5.2"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--botToken', help='telegram bot token')
@@ -26,6 +26,11 @@ config.watcherChekoutInterval = int(args.interval)
 intraserviceProvider.login = login
 intraserviceProvider.password = password
 intraserviceProvider.setBaseUrl(config.site)
+
+try:
+    os.makedirs('./data')
+except OSError:
+    pass
 
 databaseProvider.createTablesIfNotExists()
 for user in args.users.split(','):

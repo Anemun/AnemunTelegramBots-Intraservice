@@ -84,7 +84,7 @@ def recordTicket(chatId, ticketId):
         runQuery("INSERT INTO tickets (chatId, ticketId) VALUES ('{0}', '{1}')".format(chatId, ticketId))    
 
 def runQuery(query):
-    conn = sqlite3.connect('JackTeleBotUsers.db')
+    conn = sqlite3.connect(config.dbFilename)
     cursor = conn.cursor()
     cursor.execute(query)
     result = cursor.fetchall()
